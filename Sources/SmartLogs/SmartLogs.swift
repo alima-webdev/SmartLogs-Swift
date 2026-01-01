@@ -1,5 +1,21 @@
 import Foundation
 
+public enum LogBodyType: String {
+    case chart = "chart"
+    case image = "image"
+    case object = "object"
+}
+
+public struct LogChartData {
+    let x: [Float]
+    let y: [Float]
+    
+    public init(x: [Float], y: [Float]) {
+        self.x = x
+        self.y = y
+    }
+}
+
 public actor SmartLogs: NSObject, Sendable, URLSessionWebSocketDelegate {
     // Params
     let origin: String
@@ -302,26 +318,25 @@ public extension SmartLogs {
 
     // Log
     nonisolated func log<T: Any>(
-        workflowId: String, message: String, body: T, order: Int = -1
+        workflowId: String, message: String, body: T, bodyType: LogBodyType = .object, order: Int = -1
     ) {
         if let body = body as? Codable,
            let bodyData = try? JSONEncoder().encode(body),
            let bodyDict = try? JSONSerialization.jsonObject(with: bodyData, options: .fragmentsAllowed)
         {
-            log(workflowId: workflowId, message: message, body: bodyDict, order: order)
+            log(workflowId: workflowId, message: message, body: bodyDict, bodyType: bodyType, order: order)
         } else {
-            log(workflowId: workflowId, message: message, order: order)
+            log(workflowId: workflowId, message: message, bodyType: bodyType, order: order)
         }
     }
 
-    nonisolated func log(
-        workflowId: String, message: String, body: [String: Any] = [:], order: Int = -1
-    ) {
+    nonisolated func log(workflowId: String, message: String, body: [String: Any] = [:], bodyType: LogBodyType = .object, order: Int = -1) {
         do {
             let logObject: [String: Any] = [
                 "workflowId": workflowId,
                 "message": message,
                 "body": body,
+                "bodyType": bodyType,
                 "timestamp": Date().ISO8601Format(),
                 "clientTime": String(getPreciseTime()),
                 "order": order,
@@ -340,6 +355,29 @@ public extension SmartLogs {
         } catch {
             print(error)
         }
+    }
+
+    // Chart
+    nonisolated func chart(workflowId: String, message: String, data: LogChartData, order: Int = -1) {
+        self.logChart(workflowId: workflowId, message: message, data: data, order: order)
+    }
+    nonisolated func logChart(workflowId: String, message: String, data: LogChartData, order: Int = -1) {
+        let body: [String: Any] = [
+            "x": data.x,
+            "y": data.y,
+        ]
+        self.log(workflowId: workflowId, message: message, body: body, bodyType: .chart, order: order)
+    }
+
+    // Image
+    nonisolated func image(workflowId: String, message: String, image: String, order: Int = -1) {
+        self.logImage(workflowId: workflowId, message: message, image: image, order: order)
+    }
+    nonisolated func logImage(workflowId: String, message: String, image: String, order: Int = -1) {
+        let body: [String: Any] = [
+            "image": image,
+        ]
+        self.log(workflowId: workflowId, message: message, body: body, bodyType: .chart, order: order)
     }
 
     // End Workflow
