@@ -358,14 +358,17 @@ public extension SmartLogs {
     }
 
     // Chart
-    nonisolated func chart(workflowId: String, message: String, data: LogChartData, order: Int = -1) {
-        self.logChart(workflowId: workflowId, message: message, data: data, order: order)
+    nonisolated func chart(workflowId: String, message: String, data: LogChartData, title: String = "", order: Int = -1) {
+        self.logChart(workflowId: workflowId, message: message, data: data, title: title, order: order)
     }
-    nonisolated func logChart(workflowId: String, message: String, data: LogChartData, order: Int = -1) {
-        let body: [String: Any] = [
+    nonisolated func logChart(workflowId: String, message: String, data: LogChartData, title: String = "", order: Int = -1) {
+        var body: [String: Any] = [
             "x": data.x,
             "y": data.y,
         ]
+        if title != "" {
+            body["title"] = title
+        }
         self.log(workflowId: workflowId, message: message, body: body, bodyType: .chart, order: order)
     }
 
