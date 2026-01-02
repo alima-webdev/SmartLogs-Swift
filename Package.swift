@@ -6,9 +6,9 @@ import PackageDescription
 let package = Package(
     name: "SmartLogs",
     platforms: [
-        .iOS(.v15),
-        .macOS(.v15),
-        .tvOS(.v15)
+        .iOS(.v26),
+        .macOS(.v26),
+        .tvOS(.v26)
     ],
     products: [
         .library(
