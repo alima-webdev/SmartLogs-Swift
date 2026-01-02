@@ -336,7 +336,7 @@ public extension SmartLogs {
                 "workflowId": workflowId,
                 "message": message,
                 "body": body,
-                "bodyType": bodyType,
+                "bodyType": bodyType.rawValue,
                 "timestamp": Date().ISO8601Format(),
                 "clientTime": String(getPreciseTime()),
                 "order": order,
@@ -369,18 +369,20 @@ public extension SmartLogs {
         if title != "" {
             body["title"] = title
         }
-        self.log(workflowId: workflowId, message: message, body: body, bodyType: .chart, order: order)
+        print(body)
+        // self.log(workflowId: workflowId, message: message, body: body, bodyType: .chart, order: order)
     }
 
     // Image
     nonisolated func image(workflowId: String, message: String, image: String, order: Int = -1) {
+        print("IMGGG")
         self.logImage(workflowId: workflowId, message: message, image: image, order: order)
     }
     nonisolated func logImage(workflowId: String, message: String, image: String, order: Int = -1) {
         let body: [String: Any] = [
             "image": image,
         ]
-        self.log(workflowId: workflowId, message: message, body: body, bodyType: .chart, order: order)
+        self.log(workflowId: workflowId, message: message, body: body, bodyType: .image, order: order)
     }
 
     // End Workflow
